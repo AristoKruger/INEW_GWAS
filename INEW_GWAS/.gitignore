@@ -1,0 +1,64 @@
+# --- Core repository hygiene (keep teaching artifacts; ignore heavy/ephemeral outputs) ---
+# OS/editor cruft
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*.tmp
+*~
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.ipynb_checkpoints/
+.venv/
+venv/
+env/
+.mamba/
+.conda/
+
+# R
+.Rhistory
+.Rproj.user/
+
+# Build/lock/cache
+.cache/
+dist/
+build/
+*.lock
+
+# Data & results (tracked via README/metadata; large artifacts kept out of Git)
+data/**
+results/**
+tmp/
+
+# PLINK / TASSEL / STRUCTURE / GWAS byproducts
+*.bed
+*.bim
+*.fam
+*.tped
+*.tfam
+*.map
+*.log
+*.nosex
+*.hh
+*.ld
+*.frq
+*.mds
+*.eigenvec
+*.eigenval
+
+# Binary & archives
+*.zip
+*.gz
+*.bz2
+*.xz
+*.7z
+*.tar
+*.tgz
+*.rar
+
+# IDE
+.vscode/
+.idea/

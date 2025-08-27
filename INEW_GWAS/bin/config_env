@@ -1,0 +1,69 @@
+#!/usr/bin/env bash
+# Export scalar keys from a YAML file as environment variables.
+# Usage:
+#   eval "$(bin/config_env)"                  # reads config/config.yaml
+#   eval "$(bin/config_env path/to/file.yaml)"
+#   bin/config_env --help
+#
+# Notes:
+# - Requires: python3 with PyYAML (yaml) available.
+# - Flattens nested keys with underscores, uppercases, and prefixes with CFG_.
+#   Example: tools.plink -> CFG_TOOLS_PLINK
+# - If config is missing, prints a notice and exits 0 (no exports).
+
+set -eu
+
+if [ "${1-}" = "--help" ]; then
+  cat <<'HLP'
+config_env — print `export` lines for YAML scalar keys.
+
+Examples:
+  eval "$(bin/config_env)"                 # from config/config.yaml
+  eval "$(bin/config_env other.yaml)"     # from a specific file
+
+Conventions:
+  - Variables are prefixed with CFG_ and UPPER_SNAKE_CASED.
+  - Nested maps are flattened with underscores (e.g., a.b.c -> CFG_A_B_C).
+Requirements:
+  - python3 and PyYAML (`pip install pyyaml`)
+
+HLP
+  exit 0
+fi
+
+CONFIG_PATH="${1:-config/config.yaml}"
+if [ ! -f "$CONFIG_PATH" ]; then
+  echo "config_env: no config file found at '$CONFIG_PATH' (nothing to export)." >&2
+  exit 0
+fi
+
+python3 - "$CONFIG_PATH" <<'PY'
+import sys, os, re, shlex
+try:
+    import yaml
+except Exception as e:
+    sys.stderr.write("config_env: PyYAML not available — install with `pip install pyyaml`.\n")
+    sys.exit(1)
+
+def flatten(d, prefix=()):
+    if isinstance(d, dict):
+        for k, v in d.items():
+            key = re.sub(r'[^A-Za-z0-9_]', '_', str(k))
+            yield from flatten(v, prefix + (key,))
+    elif isinstance(d, (list, tuple)):
+        for i, v in enumerate(d):
+            yield from flatten(v, prefix + (str(i),))
+    else:
+        yield ("_".join(prefix), d)
+
+path = sys.argv[1]
+with open(path, "r", encoding="utf-8") as fh:
+    data = yaml.safe_load(fh) or {}
+
+for key, val in flatten(data):
+    # export only scalars
+    if isinstance(val, (str, int, float, bool)) or val is None:
+        name = "CFG_" + re.sub(r'__+', '_', key.upper())
+        sval = "" if val is None else str(val)
+        print(f"export {name}={shlex.quote(sval)}")
+PY
