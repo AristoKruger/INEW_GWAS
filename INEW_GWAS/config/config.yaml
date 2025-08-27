@@ -1,0 +1,39 @@
+project:
+  name: INEW_GWAS
+  random_seed: 42
+
+tools:
+  plink: plink
+  rscript: Rscript
+  awk: awk
+  tassel: run_pipeline.pl
+  structure: structure
+
+resources:
+  threads: 8
+
+paths:
+  repo_root: ./
+  data_root: data
+  results_root: results
+  scripts_root: scripts
+
+inputs:
+  genotypes_prefix: genotypes/inew
+  phenotypes_file: phenotypes/phenotypes.csv
+  metadata_file: metadata/sample_metadata.csv
+  references_dir: references
+
+outputs:
+  tables_dir: results/tables
+  figures_dir: results/figures
+  ibs_dir: results/IBS
+  ld_decay_dir: results/ld_decay
+  pruned_dir: results/pruned_data
+  plink_fmt_dir: results/plink_format
+
+plink_defaults:
+  mind: 0.1
+  geno: 0.1
+  maf: 0.05
+  hwe: 1e-6
