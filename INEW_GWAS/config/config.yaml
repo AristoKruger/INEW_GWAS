@@ -6,8 +6,6 @@ tools:
   plink: plink
   rscript: Rscript
   awk: awk
-  tassel: run_pipeline.pl
-  structure: structure
 
 resources:
   threads: 8
@@ -19,9 +17,9 @@ paths:
   scripts_root: scripts
 
 inputs:
-  genotypes_prefix: genotypes/inew
-  phenotypes_file: phenotypes/phenotypes.csv
-  metadata_file: metadata/sample_metadata.csv
+  genotypes_prefix: genotypes/raw_genotypes.csv
+  phenotypes_file: phenotypes/wp_pheno_results.txt
+  metadata_file: metadata/35k_probe_set_IWGSCv1.xlsx
   references_dir: references
 
 outputs:
